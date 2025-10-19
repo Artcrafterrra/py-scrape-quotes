@@ -6,6 +6,7 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup, Tag
 
+
 URL = "https://quotes.toscrape.com/"
 
 
@@ -14,6 +15,7 @@ class Quote:
     text: str
     author: str
     tags: list[str]
+
 
 def fetch_page(page_url: str) -> bytes | None:
     response = requests.get(page_url)
@@ -35,17 +37,20 @@ def page_generator() -> Generator[BeautifulSoup, None, None]:
         yield soup
         page_number += 1
 
+
 def parse_single_quote(element: Tag) -> Quote:
     text = element.select_one(".text").text.strip()
     author = element.select_one(".author").text.strip()
     tags = [tag.text.strip() for tag in element.select(".tag")]
     return Quote(text=text, author=author, tags=tags)
 
+
 def parse_page(page: BeautifulSoup) -> list[Quote]:
     result = []
     for element in page.select(".quote"):
         result.append(parse_single_quote(element))
     return result
+
 
 def get_quotes() -> list[Quote]:
     quotes = []
@@ -62,6 +67,7 @@ def main(output_csv_path: str) -> None:
 
         for quote in quotes:
             writer.writerow([quote.text, quote.author, str(quote.tags)])
+
 
 if __name__ == "__main__":
     main("quotes.csv")
